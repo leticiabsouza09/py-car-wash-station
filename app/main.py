@@ -31,7 +31,7 @@ class CarWashStation:
                  / self.distance_from_city_center)
         return round(price, 1)
 
-    def wash_single_car(self, car: Car) -> float:
+    def wash_single_car(self, car: Car) -> float | None:
         """Lava um carro se clean_power > clean_mark.
 
         Atualiza clean_mark e retorna o custo.
@@ -40,18 +40,22 @@ class CarWashStation:
             cost = self.calculate_washing_price(car)
             car.clean_mark = self.clean_power
             return cost
-        return 0.0
+        return None  # não contribui para a renda
 
     def serve_cars(self, cars: list[Car]) -> float:
         """Lava os carros elegíveis e retorna a renda total."""
-        total_income = sum(self.wash_single_car(car) for car in cars)
+        total_income = 0.0
+        for car in cars:
+            cost = self.wash_single_car(car)
+            if cost is not None:
+                total_income += cost
         return round(total_income, 1)
 
     def rate_service(self, new_rate: int) -> None:
         """Adiciona uma nova avaliação e atualiza a média."""
+        self.count_of_ratings += 1
         self.average_rating = round(
-            (self.average_rating * self.count_of_ratings + new_rate)
-            / (self.count_of_ratings + 1),
+            (self.average_rating * (self.count_of_ratings - 1) + new_rate)
+            / self.count_of_ratings,
             1
         )
-        self.count_of_ratings += 1
