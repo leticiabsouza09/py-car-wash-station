@@ -1,3 +1,10 @@
+class Car:
+    def __init__(self, comfort_class: int, clean_mark: int, brand: str):
+        self.comfort_class = comfort_class
+        self.clean_mark = clean_mark
+        self.brand = brand
+
+
 class CarWashStation:
     def __init__(self, distance_from_city_center: float, clean_power: int,
                  average_rating: float, count_of_ratings: int):
@@ -7,17 +14,32 @@ class CarWashStation:
         self.count_of_ratings = count_of_ratings
 
     def calculate_washing_price(self, car: Car) -> float:
-        """Always calculate cost using the formula, no guard needed."""
-        price = (car.comfort_class *
-                 (self.clean_power - car.clean_mark) *
-                 self.average_rating /
-                 self.distance_from_city_center)
+        """Calculate cost using the formula and return rounded result."""
+        price = (car.comfort_class
+                 * (self.clean_power - car.clean_mark)
+                 * self.average_rating
+                 / self.distance_from_city_center)
         return round(price, 1)
 
     def wash_single_car(self, car: Car) -> float:
-        """Wash a single car if clean_power > clean_mark, update mark, return cost."""
+        """Wash a single car if clean_power > clean_mark.
+
+        Update clean_mark and return cost.
+        """
         if car.clean_mark < self.clean_power:
             cost = self.calculate_washing_price(car)
             car.clean_mark = self.clean_power
             return cost
         return 0.0
+
+    def serve_cars(self, cars: list) -> float:
+        """Wash eligible cars and return total income."""
+        total_income = sum(self.wash_single_car(car) for car in cars)
+        return round(total_income, 1)
+
+    def rate_service(self, new_rate: int):
+        """Add a new rating and update average rating."""
+        total_score = self.average_rating * self.count_of_ratings
+        total_score += new_rate
+        self.count_of_ratings += 1
+        self.average_rating = round(total_score / self.count_of_ratings, 1)
